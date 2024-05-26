@@ -1,32 +1,43 @@
-from collections import defaultdict
-n, s_v = input().split()
-ad_list = defaultdict(dict)
-for i in range(int(n)):
-    v1, v2, w = input().split()
-    ad_list[v1][v2] = int(w)
+from collections import deque
 
-res = []
-open = []
-open.append([s_v, 0, []])
-while True:
-    top = open.pop(0)
-    cur_v = top[0]
-    cost = top[1]
-    path = top[2]
-    if cur_v == s_v and len(path) == len(ad_list):
-        res = path + ([s_v])
-        break
-    if len(path) + 1 == len(ad_list):
-        open.append([s_v, cost + ad_list[cur_v][s_v], path + ([cur_v])])
-    else:
-        for v in ad_list[cur_v]:
-            if v not in path:
-                open.append([v, cost + ad_list[cur_v][v], path + ([cur_v])])
+def bfs(m, n, start, end, grid):
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    queue = deque([start])
+    visited = set()
+    visited.add(start)
+    distance = 0
     
-    open.sort(key=lambda x: x[1])
-    print("open")
-    for i in open:
-        print(i)
+    while queue:
+        for _ in range(len(queue)):
+            x, y = queue.popleft()
+            
+            if (x, y) == end:
+                return distance
+            
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                
+                if 0 <= nx < m and 0 <= ny < n and (nx, ny) not in visited and grid[nx][ny] == 0:
+                    visited.add((nx, ny))
+                    queue.append((nx, ny))
+        
+        distance += 1
+    
+    return -1
 
-for i in res:
-    print(i, end=" ")
+def main():
+    # Đọc dữ liệu đầu vào
+    m, n, sx, sy, ex, ey = map(int, input().split())
+    grid = []
+    for _ in range(m):
+        grid.append(list(map(int, input().split())))
+    
+    # Tìm khoảng cách ngắn nhất bằng BFS
+    start = (sx, sy)
+    end = (ex, ey)
+    
+    result = bfs(m, n, start, end, grid)
+    print(result)
+
+if __name__ == "__main__":
+    main()
